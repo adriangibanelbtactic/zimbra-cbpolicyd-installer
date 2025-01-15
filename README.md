@@ -3,6 +3,10 @@
 Aimed at MTA nodes and MAILBOX nodes.
 Every MTA will share the same CBPolicyD config which will be stored on only one mailbox server.
 
+## About
+
+**WARNING: The development stage is in ALPHA QUALITY and it is not ready for production deployment.**
+
 ## Single server install
 
 Use `./cpolicyd-store-installer.sh` first which will output the suggested mta installer prompt which you will have to run.
