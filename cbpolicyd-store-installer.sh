@@ -35,6 +35,15 @@ Automated cbpolicyd installer for Zimbra mailbox node.
 - Installs policyd on MariaDB or MySQL (shipped with Zimbra).
 - No webui is installed.
 - Aimed at Zimbra 10.0.x
+
+Multi server install:
+Usage:   $0
+Example: $0
+
+Single server install:
+Usage:   $0 --single
+Example: $0 --single
+
 EOF
 }
 
@@ -100,7 +109,22 @@ CBPOLICYD_DBCREATE_TMP_SQL="$(mktemp /tmp/policyd-dbcreate.XXXXXXXX.sql)"
 CBPOLICYD_CONTENTS_TMP_SQL="$(mktemp /tmp/policyd-dbtables.XXXXXXXX.sql)"
 CBPOLICYD_POLICY_SQL="$(mktemp /tmp/policyd-policy.XXXXXXXX.sql)"
 
+ZMHOSTNAME="$(su - zimbra -c 'zmhostname')"
+
 # Main program
+
+# Check the arguments.
+for option in "$@"; do
+  case "$option" in
+    -h | --help)
+      usage
+      exit 0
+    ;;
+    --single)
+      IS_SINGLE="TRUE"
+    ;;
+  esac
+done
 
 # Make sure only root can run our script
 if [ "$(id -u)" != "0" ]; then
@@ -108,7 +132,56 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+function dig_requisite() {
+  if [[ "$IS_SINGLE" == "TRUE" ]] ; then
+    :
+  else
+  # Detect dig
+    if [ -x dig ] ; then
+      :
+    else
+      echo "The program needs 'dig'."
+      echo "You might need to install dnsutils package in Ubuntu."
+      echo "Aborting..."
+      exit 1
+    fi
+  fi
+}
+
+function mailbox_check () {
+  MAILBOX_FOUND="FALSE"
+
+  for nserver in $(sudo su - zimbra -c 'zmprov -l getAllServers mailbox'); do
+    if [[ "$nserver" == "${ZMHOSTNAME}" ]] ; then
+      MAILBOX_FOUND="TRUE"
+    fi
+  done
+
+  if [[ "${MAILBOX_FOUND}" == "TRUE" ]] ; then
+    :
+  else
+    echo "This node needs to be a mailbox!"
+    echo "Aborting..."
+    exit 1
+  fi
+}
+
+dig_requisite
+mailbox_check
+
 create_cbpolicyd_db_and_user # "Creating database and user"
 populate_cbpolicyd_databases # Populating databases
 # add_zimbra_policy # Setting basic quota policy
 # reporting_commands_install # Installing reporting commands
+
+if [[ "$IS_SINGLE" == "TRUE" ]] ; then
+  :
+else
+  CBPOLICYD_DB_HOST="$(dig +short ${ZMHOSTNAME} A)"
+
+  cat << EOF
+To be run on every MTA node:
+
+./cbpolicyd-mta-installer.sh --db-host='${CBPOLICYD_DB_HOST}' --db-password='${CBPOLICYD_PWD}'
+EOF
+fi
