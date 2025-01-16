@@ -96,42 +96,6 @@ function reporting_commands_install () {
   chmod +rx /usr/local/sbin/cbpolicyd-report
 }
 
-# Definitions
-
-CBPOLICYD_CLEANUP_CRON_FILE='/etc/cron.d/zimbra-cbpolicyd-cleanup'
-ZIMBRA_MYSQL_BINARY="/opt/zimbra/bin/mysql"
-
-CBPOLICYD_PWD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 10)
-CBPOLICYD_DATABASE_USER='ad-policyd_db'
-CBPOLICYD_DATABASE='policyd_db'
-
-CBPOLICYD_DBCREATE_TMP_SQL="$(mktemp /tmp/policyd-dbcreate.XXXXXXXX.sql)"
-CBPOLICYD_CONTENTS_TMP_SQL="$(mktemp /tmp/policyd-dbtables.XXXXXXXX.sql)"
-CBPOLICYD_POLICY_SQL="$(mktemp /tmp/policyd-policy.XXXXXXXX.sql)"
-
-ZMHOSTNAME="$(su - zimbra -c 'zmhostname')"
-
-# Main program
-
-# Check the arguments.
-for option in "$@"; do
-  case "$option" in
-    -h | --help)
-      usage
-      exit 0
-    ;;
-    --single)
-      IS_SINGLE="TRUE"
-    ;;
-  esac
-done
-
-# Make sure only root can run our script
-if [ "$(id -u)" != "0" ]; then
-   echo "This script must be run as root" 1>&2
-   exit 1
-fi
-
 function dig_requisite() {
   if [[ "$IS_SINGLE" == "TRUE" ]] ; then
     :
@@ -165,6 +129,42 @@ function mailbox_check () {
     exit 1
   fi
 }
+
+# Main program
+
+# Check the arguments.
+for option in "$@"; do
+  case "$option" in
+    -h | --help)
+      usage
+      exit 0
+    ;;
+    --single)
+      IS_SINGLE="TRUE"
+    ;;
+  esac
+done
+
+# Make sure only root can run our script
+if [ "$(id -u)" != "0" ]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
+
+# Definitions
+
+CBPOLICYD_CLEANUP_CRON_FILE='/etc/cron.d/zimbra-cbpolicyd-cleanup'
+ZIMBRA_MYSQL_BINARY="/opt/zimbra/bin/mysql"
+
+CBPOLICYD_PWD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 10)
+CBPOLICYD_DATABASE_USER='ad-policyd_db'
+CBPOLICYD_DATABASE='policyd_db'
+
+CBPOLICYD_DBCREATE_TMP_SQL="$(mktemp /tmp/policyd-dbcreate.XXXXXXXX.sql)"
+CBPOLICYD_CONTENTS_TMP_SQL="$(mktemp /tmp/policyd-dbtables.XXXXXXXX.sql)"
+CBPOLICYD_POLICY_SQL="$(mktemp /tmp/policyd-policy.XXXXXXXX.sql)"
+
+ZMHOSTNAME="$(su - zimbra -c 'zmhostname')"
 
 dig_requisite
 mailbox_check
