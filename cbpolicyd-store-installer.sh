@@ -101,9 +101,8 @@ function dig_requisite() {
     :
   else
   # Detect dig
-    if [ -x dig ] ; then
-      :
-    else
+    if ! command -v dig 2>&1 >/dev/null
+    then
       echo "The program needs 'dig'."
       echo "You might need to install dnsutils package in Ubuntu."
       echo "Aborting..."
