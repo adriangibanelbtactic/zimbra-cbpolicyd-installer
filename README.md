@@ -29,6 +29,8 @@ zmprov ms $(zmhostname) zimbraCBPolicydQuotasEnabled TRUE
 2. On the same Zimbra mailbox edit `/opt/zimbra/conf/my.cnf` and replace `bind-address = 127.0.0.1` with `bind-address = 0.0.0.0`.
 **Warning**: If this mailbox is somehow directly exposed to the Internet you will have to harden the 7306 port thanks to some Firewall rules.
 
+Make sure that you restart mailbox service with `su - zimbra -c 'zmmailboxdctl restart'` so that the new settings are applied.
+
 3. On every Zimbra mta node use the suggested mta installer prompt.
 4. On every Zimbra mta node turn on CBPolicyD by running:
 ```
