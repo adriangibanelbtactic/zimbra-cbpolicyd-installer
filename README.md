@@ -24,10 +24,13 @@ zmprov ms $(zmhostname) zimbraCBPolicydQuotasEnabled TRUE
 
 ## Multi server install
 
-On one of the Zimbra mailbox nodes use `./cpolicyd-store-installer.sh` first which will output the suggested mta installer prompt which you will have to run.
+1. On one of the Zimbra mailbox nodes use `./cpolicyd-store-installer.sh` first which will output the suggested mta installer prompt which you will have to run.
 
-On every Zimbra mta node use the suggested mta installer prompt.
-On every Zimbra mta node turn on CBPolicyD by running:
+2. On the same Zimbra mailbox edit `/opt/zimbra/conf/my.cnf` and replace `bind-address = 127.0.0.1` with `bind-address = 0.0.0.0`.
+**Warning**: If this mailbox is somehow directly exposed to the Internet you will have to harden the 7306 port thanks to some Firewall rules.
+
+3. On every Zimbra mta node use the suggested mta installer prompt.
+4. On every Zimbra mta node turn on CBPolicyD by running:
 ```
 zmprov ms $(zmhostname) +zimbraServiceEnabled cbpolicyd
 zmprov ms $(zmhostname) zimbraCBPolicydQuotasEnabled TRUE
