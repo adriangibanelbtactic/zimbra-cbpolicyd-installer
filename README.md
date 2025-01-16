@@ -24,6 +24,8 @@ zmprov ms $(zmhostname) zimbraCBPolicydQuotasEnabled TRUE
 
 ## Multi server install
 
+### Steps
+
 1. On one of the Zimbra mailbox nodes use `./cpolicyd-store-installer.sh` first which will output the suggested mta installer prompt which you will have to run.
 
 2. On the same Zimbra mailbox edit `/opt/zimbra/conf/my.cnf` and replace `bind-address = 127.0.0.1` with `bind-address = 0.0.0.0`.
@@ -38,9 +40,52 @@ zmprov ms $(zmhostname) +zimbraServiceEnabled cbpolicyd
 zmprov ms $(zmhostname) zimbraCBPolicydQuotasEnabled TRUE
 ```
 
-Example:
+### Mailbox - Multi server install example
+
 ```
-TODO
+cd /tmp
+git clone https://github.com/btactic/zimbra-cbpolicyd-installer.git
+cd zimbra-cbpolicyd-installer
+
+sudo ./cbpolicyd-store-installer.sh
+```
+
+At this point write down the suggested command.
+
+As an optional step you can edit default policies.
+
+```
+su - zimbra
+mysql policyd_db
+# Edit policies with mysql
+exit
+```
+
+Finally edit my.cnf to allow remote connections:
+```
+vim  /opt/zimbra/conf/my.cnf
+# Replace `bind-address = 127.0.0.1` with `bind-address = 0.0.0.0`.
+
+su - zimbra -c 'zmmailboxdctl restart'
+```
+
+### MTA - Multi server install example
+
+```
+cd /tmp
+git clone https://github.com/btactic/zimbra-cbpolicyd-installer.git
+cd zimbra-cbpolicyd-installer
+```
+Now run the suggested command from the mailbox output:
+```
+sudo ./cbpolicyd-mta-installer.sh --db-host='192.168.0.200' --db-password='i7xO7ov88G'
+```
+.
+
+Finally turn on CBPolicyD:
+```
+su - zimbra -c 'zmprov ms $(zmhostname) +zimbraServiceEnabled cbpolicyd'
+su - zimbra -c 'zmprov ms $(zmhostname) zimbraCBPolicydQuotasEnabled TRUE'
 ```
 
 ## Mailbox notes
@@ -56,11 +101,15 @@ UPDATE quotas_limits SET CounterLimit = 30 WHERE ID = 4;
 
 ## MTA notes
 
-You can check CBPolicyD logs by running:
+- You can check CBPolicyD logs by running:
 ```
 tail -f /opt/zimbra/log/cbpolicyd.log
 ```
 .
+
+- You can modify some settings at `/opt/zimbra/conf/cbpolicyd.conf.in`.
+
+- Make sure to comment `::1 localhost` line in `/etc/hosts` if your VPS is IPv4 only.
 
 ## Credits
 
