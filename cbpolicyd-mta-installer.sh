@@ -74,16 +74,6 @@ function mta_check () {
   fi
 }
 
-# Definitions
-
-ZIMBRA_MYSQL_BINARY="/opt/zimbra/bin/mysql"
-
-CBPOLICYD_DATABASE_USER='ad-policyd_db'
-CBPOLICYD_DATABASE='policyd_db'
-
-CBPOLICYDCONF_TMP_BACKUP="$(mktemp /tmp/cbpolicyd.conf.in.XXXXXXXX)"
-CBPOLICYD_CONF_IN='/opt/zimbra/conf/cbpolicyd.conf.in'
-
 # Main program
 
 # Check the arguments.
@@ -117,6 +107,16 @@ if [[ "x$CBPOLICYD_DB_HOST" == x ]] ; then
   usage
   exit 1
 fi
+
+# Definitions
+
+ZIMBRA_MYSQL_BINARY="/opt/zimbra/bin/mysql"
+
+CBPOLICYD_DATABASE_USER='ad-policyd_db'
+CBPOLICYD_DATABASE='policyd_db'
+
+CBPOLICYDCONF_TMP_BACKUP="$(mktemp /tmp/cbpolicyd.conf.in.XXXXXXXX)"
+CBPOLICYD_CONF_IN='/opt/zimbra/conf/cbpolicyd.conf.in'
 
 mta_check
 
