@@ -152,7 +152,6 @@ fi
 
 # Definitions
 
-CBPOLICYD_CLEANUP_CRON_FILE='/etc/cron.d/zimbra-cbpolicyd-cleanup'
 ZIMBRA_MYSQL_BINARY="mysql"
 
 CBPOLICYD_PWD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 10)

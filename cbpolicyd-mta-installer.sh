@@ -110,6 +110,7 @@ fi
 
 # Definitions
 
+CBPOLICYD_CLEANUP_CRON_FILE='/etc/cron.d/zimbra-cbpolicyd-cleanup'
 ZIMBRA_MYSQL_BINARY="/opt/zimbra/bin/mysql"
 
 CBPOLICYD_DATABASE_USER='ad-policyd_db'
