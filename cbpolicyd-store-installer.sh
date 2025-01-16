@@ -57,7 +57,7 @@ GRANT ALL PRIVILEGES ON ${CBPOLICYD_DATABASE} . * TO '${CBPOLICYD_DATABASE_USER}
 FLUSH PRIVILEGES ; 
 EOF
 
-  ${ZIMBRA_MYSQL_BINARY} < "${CBPOLICYD_DBCREATE_TMP_SQL}"
+  su - zimbra -c "${ZIMBRA_MYSQL_BINARY}" < "${CBPOLICYD_DBCREATE_TMP_SQL}"
 }
 
 function populate_cbpolicyd_databases () {
@@ -75,7 +75,7 @@ function populate_cbpolicyd_databases () {
       ./convert-tsql mysql $ntsql;
 done > "${CBPOLICYD_CONTENTS_TMP_SQL}"
 
-  ${ZIMBRA_MYSQL_BINARY} ${CBPOLICYD_DATABASE} < "${CBPOLICYD_CONTENTS_TMP_SQL}"
+  su - zimbra -c "${ZIMBRA_MYSQL_BINARY} ${CBPOLICYD_DATABASE}" < "${CBPOLICYD_CONTENTS_TMP_SQL}"
 }
 
 function add_zimbra_policy () {
@@ -88,11 +88,11 @@ INSERT INTO quotas_limits (QuotasID,Type,CounterLimit) VALUES(3, 'MessageCount',
 INSERT INTO quotas_limits (QuotasID,Type,CounterLimit) VALUES(4, 'MessageCount', 125);
 EOF
 
-${ZIMBRA_MYSQL_BINARY} ${CBPOLICYD_DATABASE} < "${CBPOLICYD_POLICY_SQL}"
+su - zimbra -c "${ZIMBRA_MYSQL_BINARY} ${CBPOLICYD_DATABASE}" < "${CBPOLICYD_POLICY_SQL}"
 }
 
 function reporting_commands_install () {
-  echo "${ZIMBRA_MYSQL_BINARY} ${CBPOLICYD_DATABASE} -e \"select count(instance) count, sender from session_tracking where date(from_unixtime(unixtimestamp))=curdate() group by sender order by count desc;\"" > /usr/local/sbin/cbpolicyd-report
+  echo "su - zimbra -c \"${ZIMBRA_MYSQL_BINARY} ${CBPOLICYD_DATABASE} -e 'select count(instance) count, sender from session_tracking where date(from_unixtime(unixtimestamp))=curdate() group by sender order by count desc;'\"" > /usr/local/sbin/cbpolicyd-report
   chmod +rx /usr/local/sbin/cbpolicyd-report
 }
 
@@ -153,7 +153,7 @@ fi
 # Definitions
 
 CBPOLICYD_CLEANUP_CRON_FILE='/etc/cron.d/zimbra-cbpolicyd-cleanup'
-ZIMBRA_MYSQL_BINARY="/opt/zimbra/bin/mysql"
+ZIMBRA_MYSQL_BINARY="mysql"
 
 CBPOLICYD_PWD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 10)
 CBPOLICYD_DATABASE_USER='ad-policyd_db'
