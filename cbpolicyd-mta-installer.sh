@@ -118,6 +118,8 @@ CBPOLICYD_DATABASE='policyd_db'
 CBPOLICYDCONF_TMP_BACKUP="$(mktemp /tmp/cbpolicyd.conf.in.XXXXXXXX)"
 CBPOLICYD_CONF_IN='/opt/zimbra/conf/cbpolicyd.conf.in'
 
+ZMHOSTNAME="$(su - zimbra -c 'zmhostname')"
+
 mta_check
 
 update_cbpolicyd_conf_in_settings # Update username, password and database on cbpolicyd.conf.in
