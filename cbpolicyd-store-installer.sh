@@ -38,17 +38,6 @@ Automated cbpolicyd installer for Zimbra mailbox node.
 EOF
 }
 
-function create_cbpolicyd_mysql_user () {
-  cat <<EOF > "${CBPOLICYD_DBCREATE_TMP_SQL}"
-CREATE DATABASE ${CBPOLICYD_DATABASE} CHARACTER SET 'UTF8'; 
-CREATE USER '${CBPOLICYD_DATABASE_USER}'@'localhost' IDENTIFIED BY '${CBPOLICYD_PWD}'; 
-GRANT ALL PRIVILEGES ON ${CBPOLICYD_DATABASE} . * TO '${CBPOLICYD_DATABASE_USER}'@'localhost' WITH GRANT OPTION; 
-FLUSH PRIVILEGES ; 
-EOF
-
-  "${ZIMBRA_MYSQL_BINARY}" --force < "${CBPOLICYD_DBCREATE_TMP_SQL}" > /dev/null 2>&1
-}
-
 function create_cbpolicyd_db_and_user () {
   cat <<EOF > "${CBPOLICYD_DBCREATE_TMP_SQL}"
 DROP USER '${CBPOLICYD_DATABASE_USER}'@'localhost';
@@ -119,7 +108,6 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-create_cbpolicyd_mysql_user # creating a user, just to make sure we have one (for mysql on CentOS 6, so we can execute the next mysql queries w/o errors)
 create_cbpolicyd_db_and_user # "Creating database and user"
 populate_cbpolicyd_databases # Populating databases
 # add_zimbra_policy # Setting basic quota policy
