@@ -115,7 +115,7 @@ function dig_requisite() {
 function mailbox_check () {
   MAILBOX_FOUND="FALSE"
 
-  for nserver in $(sudo su - zimbra -c 'zmprov -l getAllServers mailbox'); do
+  for nserver in $(su - zimbra -c 'zmprov -l getAllServers mailbox'); do
     if [[ "$nserver" == "${ZMHOSTNAME}" ]] ; then
       MAILBOX_FOUND="TRUE"
     fi

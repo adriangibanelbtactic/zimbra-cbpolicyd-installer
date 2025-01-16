@@ -59,7 +59,7 @@ function cron_setup () {
 function mta_check () {
   MTA_FOUND="FALSE"
 
-  for nserver in $(sudo su - zimbra -c 'zmprov -l getAllServers mta'); do
+  for nserver in $(su - zimbra -c 'zmprov -l getAllServers mta'); do
     if [[ "$nserver" == "${ZMHOSTNAME}" ]] ; then
       MTA_FOUND="TRUE"
     fi
