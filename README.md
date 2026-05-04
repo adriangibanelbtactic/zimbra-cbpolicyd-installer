@@ -111,6 +111,28 @@ tail -f /opt/zimbra/log/cbpolicyd.log
 
 - Make sure to comment `::1 localhost` line in `/etc/hosts` if your VPS is IPv4 only.
 
+## Password update scripts
+
+Use these helper scripts when you want to rotate the CBPolicyD database password after the initial installation.
+
+1. On the mailbox server where `policyd_db` lives, generate and apply a new random SQL user password:
+```
+sudo ./cbpolicyd-store-update-password.sh
+```
+
+Write down the generated password shown by the script output.
+
+2. On each MTA node, update `/opt/zimbra/conf/cbpolicyd.conf.in` so it uses the same generated password:
+```
+sudo ./cbpolicyd-mta-update-password.sh --db-host='192.168.0.200' --db-password='GENERATED_PASSWORD_FROM_STEP_1'
+```
+
+Notes:
+
+- `cbpolicyd-store-update-password.sh` only updates MySQL credentials for `ad-policyd_db`.
+- `cbpolicyd-mta-update-password.sh` only updates `cbpolicyd.conf.in` (Username/Password/DSN).
+- Neither script installs or updates cleanup cron jobs.
+
 ## Credits
 
 These scripts are based mainly on [https://github.com/Zimbra-Community/zimbra-tools/blob/master/cbpolicyd.sh] originally made by Barry De Graaff.
